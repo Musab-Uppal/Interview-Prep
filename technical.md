@@ -61,6 +61,26 @@ Pure LINQ uses .ToList(), EF Core uses .ToListAsync()
 
 - LINQ is the query syntax that works on any collection. EF Core uses LINQ on IQueryable to translate C# expressions into SQL at the database level. The critical difference is IQueryable defers execution and runs on the DB, while IEnumerable runs in memory — using the wrong one on large tables is a classic performance bug.
 
+## Types of LINQ Quries
+
+### 1. Method Syntax (Lambda) — what everyone uses
+- var products = _context.Products
+    .Where(p => p.Price > 5000)
+    .OrderBy(p => p.Name)
+    .Select(p => p.Name)
+    .ToListAsync();
+
+### 2. Query Syntax (SQL-like) — rarely used in modern .NET
+- var products = (from p in _context.Products
+                where p.Price > 5000
+                orderby p.Name
+                select p.Name)
+               .ToList();
+
+## Dapper 
+Dapper is a micro ORM. You write raw SQL yourself, Dapper just maps the results to your C# objects. Nothing more.
+### Where to Use Dapper
+- Not a replacement for EF Core — use both together. EF Core for standard CRUD, Dapper for complex heavy queries.
 # DB First and Code First approaches
 
 ## Code First
@@ -153,7 +173,11 @@ Domain and application does not cummunicate with external libs like EF Core Infr
 
 #### Presentation Layer
 - Write controllers here which exposes end point to clients
-
+### CQRS (Command Query Responsibility Segregation)
+- Often used alongside Clean Architecture. Separates read operations from write operations.
+- Write id treated as command it changes state add or modify some data return nothing or an ID does not require to be fast
+- Read is treated as a query and it should be fast and it never changes state
+- In .NET this is usually implemented with MediatR library — handlers for each command/query. Just know the concept, mention MediatR if asked.
 ## Microservice
 - Each service has its own responsibility and own database and each service is deployed separately 
 ### Cummunication
@@ -165,3 +189,53 @@ Domain and application does not cummunicate with external libs like EF Core Infr
 - This is asynchrnous cummunication each service does its part of the job and put the request in the message bus other service consume it from the bus
 - One service fail does not crash the whole app
 - Complex required mature devOps engineers
+
+
+# Authentication and Authorization
+Request comes in
+      ↓
+Authentication middleware — reads token, identifies user
+      ↓
+Authorization middleware — checks if this user can access this route
+      ↓
+Controller
+- They play their roles in the middleware
+## Authentication Who are you?
+- Login -> verify identity -> issue token
+- It asks the user who are you do you belong here or not
+
+### JWT (Json Web Token)
+
+- A JWT is 3 parts separated by dots: 
+- eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjMifQ.SflKxwRJS
+-       Header                  Payload          Signature
+
+// Header — algorithm used
+{ "alg": "HS256", "typ": "JWT" }
+
+// Payload — claims (user data)
+{
+  "sub": "user-guid-here",
+  "email": "musab@gmail.com",
+  "role": "Admin",
+  "exp": 1718000000   // expiry timestamp
+}
+
+// Signature — Header + Payload signed with secret key
+// If anyone tampers with payload, signature won't match → rejected
+HMACSHA256(base64(header) + "." + base64(payload), secretKey)
+
+- Important: JWT payload is base64 encoded, not encrypted. Anyone can decode and read it. Never put sensitive data like passwords in it.
+
+## AUTHORIZATION What can you do?
+- 3 types in ASP.NET Core — Role, Claims, Policy.
+### Type 1 — Role Based (Most Common)
+[Authorize]                       // any authenticated user
+[Authorize(Roles = "Admin")]      // only Admin
+[Authorize(Roles = "Admin,Manager")] // Admin OR Manager
+
+### Type 2 — Claims Based
+- Claims are key-value pairs inside the token. More granular than roles.
+
+### Type 3 — Policy Based (Most Flexible)
+- Policies let you combine multiple rules into one named requirement.
