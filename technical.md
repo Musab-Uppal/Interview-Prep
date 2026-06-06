@@ -61,6 +61,7 @@ Pure LINQ uses .ToList(), EF Core uses .ToListAsync()
 
 - LINQ is the query syntax that works on any collection. EF Core uses LINQ on IQueryable to translate C# expressions into SQL at the database level. The critical difference is IQueryable defers execution and runs on the DB, while IEnumerable runs in memory — using the wrong one on large tables is a classic performance bug.
 
+Query is not executes untill we call a terminal function like .tolistasync or toarrayasyn
 ## Types of LINQ Quries
 
 ### 1. Method Syntax (Lambda) — what everyone uses
@@ -239,3 +240,32 @@ HMACSHA256(base64(header) + "." + base64(payload), secretKey)
 
 ### Type 3 — Policy Based (Most Flexible)
 - Policies let you combine multiple rules into one named requirement.
+
+
+# Short Differences
+
+## App.use vs App.run
+- App.use() to call a middleware 
+- App.run() final call to start the app no middleware after that
+
+## String vs String builder
+- String is immutable every operation creates a new object
+- StringBuilder is mutable
+
+## Var vs Dynamic
+- var is inferred at compile time but its still strongly typed 
+- var name = "abc"
+- name = 123 compiler error compiler knows its a string
+
+- dynamic is completely executed at runtime
+
+## ref vs out
+- ref = already has a value, method may change it.
+-  out = method is responsible for giving it a value.
+- Common real use: int.TryParse("123", out int value).
+
+## Model Binding
+- ASP.NET Core automatically maps incoming HTTP request data to your method parameters.
+
+## Global Exception Handling
+- Instead of try/catch in every controller, handle all exceptions in one place.
