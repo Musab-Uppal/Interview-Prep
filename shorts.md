@@ -26,3 +26,14 @@ var name = "abc";
 
 ## Global Exception Handling
 - Instead of try/catch in every controller, handle exceptions centrally in middleware.
+
+
+# .Net Core vs .Net Framework
+- .NET Framework is the original Windows-only implementation. .NET Core is cross-platform, modular, and open-source. Since .NET 5, Microsoft unified them into a single product called .NET (currently .NET 6/7/8). For new development, everyone uses .NET Core or the later .NET versions. I built my e-commerce backend with ASP.NET Core 8 – it runs on Linux in Azure, which .NET Framework cannot do.”*
+
+# JWT vs Session
+- The One Real Tradeoff to Mention
+Sessions win on invalidation — if a user gets compromised you delete their session instantly, they're logged out immediately.
+JWT loses here — you cannot invalidate a JWT before it expires. If someone steals a token that expires in 7 days, they have 7 days of access. Solutions exist like token blacklists but they reintroduce server state which defeats the purpose.
+
+- Sessions store login state on the server and give the client just an ID. JWT stores everything in the token itself so the server is completely stateless — no database lookup on every request, just signature validation. JWT scales better because any server can validate the token without shared storage. The tradeoff is invalidation — with sessions you can log someone out instantly by deleting their session, with JWT the token stays valid until it expires which is why I keep expiry times short.
