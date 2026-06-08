@@ -59,7 +59,6 @@ A focused collection of everything you need to crack a junior .NET developer int
 5. **Auth** — JWT/session is always asked.
 6. **C# Fundamentals** — quick-fire difference questions.
 7. **Behavioural** — don't neglect this; it's half the interview.
-8. **Personal** — company-specific HR answers.
 
 ---
 
